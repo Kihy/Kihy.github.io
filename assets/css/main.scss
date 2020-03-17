@@ -78,3 +78,10 @@
 	@import 'layout/footer';
 	@import 'layout/wrapper';
 	@import 'layout/menu';
+
+	.resize {
+		height: auto;
+		width: auto;
+		max-width: 540px;
+		max-height: 540px;
+	}
