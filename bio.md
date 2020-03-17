@@ -77,3 +77,5 @@ Other than his academic commitments, Ke enjoys a wide range of sports such as ba
 			<p>Worked as part of the image processing team, working on object detection of helmet-less workers on construction sites. The project is on-going and multiple CNN architectures have been trialed and used, such as YOLO, PVAnet, RetinaNet, etc.
 			</p></dd>
 		</dl>
+</div>
+</div>	
