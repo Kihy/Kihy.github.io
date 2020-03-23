@@ -29,7 +29,7 @@ def a(min,max):
       return scaled
     return b
 ```
-
+It is advised to use tf.saved_model function rather than model.save, as we have our custom object. model.save will need to define several other methods in order to for it to work with custom objects.
 
 ### dataset visualization and evaluation
 It would be useful to create dataset stats and visualizations, therefore dataframe.hist() and counts of each class is generated. Once that is done we use the evaluation module for NSL KDD to generate heatmaps and classification reports.
