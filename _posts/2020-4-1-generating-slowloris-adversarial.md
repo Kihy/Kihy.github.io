@@ -18,7 +18,7 @@ Prior constraints are constraints that are placed during adversarial generation 
 Posterior constraints are placed after an adversarial sample has been generated. It describes the ability of the attacker to modify the sample. As an example, if the JSMA algorithm shows altering payload length can bypass the classifier, but the attacker is a script-kiddy and does not know how to do so, the adversarial sample is unlikely to be useful. Another examples is different frameworks have different levels of customization of the same attack, so depending on the level of customization the posterior contraints will differ.
 
 Prior constraints are fixed for each type of attack, and can be reused, while posterior constraints depend on each individual/framework. The overall constraint is made as an intersection of the two constraints. The relationship between the contraints and adversarial samples are shown:
-![Constraints](assets/images/charts/constraints.png)
+![Constraints](../assets/images/charts/constraints.png)
 
 ### Constrained sample creation
 The unconstrained sample creation shows various flag counts and subflow packet length can be modified to create adversarial sample. However such features specified by protocol is hard to have specific control. Thus a constrained creation was done that fixes all features containing flags and subflow.
