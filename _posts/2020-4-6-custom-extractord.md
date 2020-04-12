@@ -16,8 +16,8 @@ Another detail to note is that parallel connections can mess up packet index. Th
 ## CIC IDS dataset
 
 As mentioned multiple times in the blog posts before, the flow features exhibits weird behavior that can be caused either by the flow feature extractor or the network traffic data. A closer look at the raw dataset pcap files shows the following:
-1\. The flows provided with the dataset is wrong. It contains way too many single packet flows. This can be verified by using the CICFlowmeter on the raw pcap files.
-2\. The extracted flow from the flow meter sometimes have 2 flows instead of 1 (maybe intended because of Bidirectional flows?). This can be verified by examining the conversations in wireshark(which is essentially a flow).
+1. The flows provided with the dataset is wrong. It contains way too many single packet flows. This can be verified by using the CICFlowmeter on the raw pcap files.
+2. The extracted flow from the flow meter sometimes have 2 flows instead of 1 (maybe intended because of Bidirectional flows?). This can be verified by examining the conversations in wireshark(which is essentially a flow).
 
 So our own flow extractor is probably needed.
 
@@ -50,10 +50,10 @@ The CICFlowMeter's measure of a distribution assumes that the underlying distrib
 | duration                   | total duration of flow                            | 1                  |
 | protocol                   | protocol used for the flow                        | 1                  |
 | {dst,src}\_port            | destination and source port number                | 2                  |
-| {fwd,bwd}\_tot\_{pkt,byte} | total number of forward/backward packet and bytes | 2 * 2             |
-| {fwd,bwd}_pkt_size_{n}     | distribution of fwd/bwd packet size               | 2 * 5              |
-| {fwd,bwd}_iat_{n}          | distribution of fwd/bwd inter arrival time        | 2 * 5                |
-| {fwd,bwd}\_{flags}\_cnt    | number of packets with various flags              | 2 * 8                |
+| {fwd,bwd}\_tot\_{pkt,byte} | total number of forward/backward packet and bytes | 2 \* 2             |
+| {fwd,bwd}_pkt_size_{n}     | distribution of fwd/bwd packet size               | 2 \* 5             |
+| {fwd,bwd}_iat_{n}          | distribution of fwd/bwd inter arrival time        | 2 \* 5             |
+| {fwd,bwd}\_{flags}\_cnt    | number of packets with various flags              | 2 \* 8             |
 
 Where n={1,25,50,75,99} and flags={FIN,SYN,RST,PUSH,ACK,URG,CWE,ECE}, and forward packet is defined by source to destination, backward is destination to source.
 A total of 1+1+2+4+10+10+16=44 features

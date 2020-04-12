@@ -36,9 +36,10 @@ So a threshold for anomaly would be set somewhere around 0.014
 Then a random sample with attribute a not in its usual range is generated:
 [0.4845569,0.39394628,0.64963341,0.83376447]
 and it does indeed give a MSE of 0.031246021, which is above the threshold. A method similar to FGSM can be used to create adversarial samples. Using tf.gradient tape we can get the gradient of input wrt to the output:  0.17988138  0.00892995  0.0124712  -0.02067012. With this information we know increasing 1,2,3 attribute will increase the MSE and increase 4 will decrease MSE. Now there are a couple of ways to generate the adversarial sample:
-1\. the FGSM way would be getting the sign of the gradient and perturb input accordingly (-positive sign and + negative sign)
-2\. Or you could find the maximum abs(gradient) and manipulate the input according to the sign. Probably generates least amount of perturbation
-3\. A more complex way is to see if there are positive and negative gradient, and find a balance between adding and subtracting features so the adversarial sample is vastly different.
+
+1.  the FGSM way would be getting the sign of the gradient and perturb input accordingly (-positive sign and + negative sign)
+2.  Or you could find the maximum abs(gradient) and manipulate the input according to the sign. Probably generates least amount of perturbation
+3.  A more complex way is to see if there are positive and negative gradient, and find a balance between adding and subtracting features so the adversarial sample is vastly different.
 
 Using method 2 an adversarial samples is found:
 0.3545569  0.39394628 0.64963341 0.83376447
