@@ -59,3 +59,18 @@ Where n={1,25,50,75,99} and flags={FIN,SYN,RST,PUSH,ACK,URG,CWE,ECE}, and forwar
 A total of 1+1+2+4+10+10+16=44 features
 
 When implementing tdigest, it was realised each flow does not have enough packets for it to be worth using tdigest, and there are some problems with getting the right percentile. Thus it was switched to use IncrementalStatistics to calculate mean, std, skewness and kurtosis with min and max value.
+
+The upated features are:
+
+| feature name               | description                                       | number of features |
+| -------------------------- | ------------------------------------------------- | ------------------ |
+| duration                   | total duration of flow                            | 1                  |
+| protocol                   | protocol used for the flow                        | 1                  |
+| {dst,src}\_port            | destination and source port number                | 2                  |
+| {fwd,bwd}\_tot\_{pkt,byte} | total number of forward/backward packet and bytes | 2 \* 2             |
+| {fwd,bwd}_pkt_size_{stat}  | distribution of fwd/bwd packet size               | 2 \* 6             |
+| {fwd,bwd}_iat_{stat}       | distribution of fwd/bwd inter arrival time        | 2 \* 6             |
+| {fwd,bwd}\_{flags}\_cnt    | number of packets with various flags              | 2 \* 8             |
+| total                      | total number of features                          | 46                 |
+
+Where stat={mean,std,skew,kurtosis,min,max} and everything else is the same.
