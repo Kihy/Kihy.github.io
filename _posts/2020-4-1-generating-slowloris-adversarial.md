@@ -5,7 +5,7 @@ author: "Ke He"
 description: "Creating Adversarial slowloris samples with out network"
 ---
 
-### Adversarial Generation
+## Adversarial Generation
 
 To generate adversarial samples we have chosen to use JSMA method. JSMA relies on saliency maps to perturb the feature that contributes most towards a particular class. The original implementation of saliency maps only increase or decrease features. Our implementation is a modification of the original implementation that compares the saliency map of increase and decrease feature and picks the maximum value out of the two. It does come with some consequences: there will be a particular sample with particular theta value that will oscillate between increasing and decreasing a set of features, causing the sample to never reach the end.
 
@@ -15,7 +15,16 @@ It is important to have constraints in our adversarial generation. In our framew
 
 #### Prior constraints
 
-Prior constraints are constraints that are placed during adversarial generation (e.g. forcing particular column to not change). These are constraints that describe the key characteristics of a class that makes the adversarial attack, and perturbing such feature makes the adversarial sample impossible to be produced (e.g. changing protol for most DoS attacks), which is not useful at all. In image classification problems, these constraints can be thought of as clipping pixel values to be between 0~255(or 0~1 depending on scale).
+Prior constraints are constraints that are placed during adversarial generation (e.g. forcing particular column to not change). They can represent different goals of the attacker, and thus we define two prior constraints: strict and loose.
+
+##### Strict prior constraints
+
+Strict prior constraints describe the key characteristics of a class that makes the adversarial attack, and perturbing such feature makes the adversarial sample impossible to be produced or the produced sample would no longer be the attack (e.g. changing protol for most DoS attacks). The goal of the attacker using this constraint would be to bypass the classifier with a particular attack (e.g. slowloris).
+
+##### Loose prior constraints
+
+Loose prior constraints only forces fields to be in a valid range, for example the payload cannot exceed 1500 (the MTU) bytes. This means the adversarial sample could be perturbed to become a different attack. The goal of the attacker in this case would be to bypass the classifier with any attack.
+
 
 #### Posterior constraints
 

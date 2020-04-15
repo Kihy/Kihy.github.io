@@ -74,3 +74,14 @@ The upated features are:
 | total                      | total number of features                          | 46                 |
 
 Where stat={mean,std,skew,kurtosis,min,max} and everything else is the same.
+
+## Extractor logic
+The feature extractor uses observer pattern to be more robust. the observable is a StreamingInterface, where packet data is generated. Currently only offline interface that reads from a pcap file is developed. In the future it is possible to create a real-time interface reading directly from NIC.
+
+Once a packet is read/received, the StreamingInterface notifies all observers. The observers in this case is the flowmeter. Currently only TCP flowmeter is created, and it has a dictionary of flows that contain statistics of the flow. To reduce memory, if a flow did not have a packet 600 seconds since the last packet, it will be considered as finished, and thus saved to file and removed from our flow dictionary.
+
+## implementation Details
+- The offline version of the flow meter relies on tshark's internal stream indexes to determine flows. For real time interface, probably need to create 5 tuples as index.
+- The flow meter currently only checks TCP and UDP packets.
+- The packet size attribute is the size of the entire packet, rather than size of tcp payload. This is done so that we can compare with wireshark conversations.
+- The ordering of flows generated is by finish time, or if multiple flows have finished it is by start time
