@@ -84,4 +84,10 @@ Once a packet is read/received, the StreamingInterface notifies all observers. T
 - The offline version of the flow meter relies on tshark's internal stream indexes to determine flows. For real time interface, probably need to create 5 tuples as index.
 - The flow meter currently only checks TCP and UDP packets.
 - The packet size attribute is the size of the entire packet, rather than size of tcp payload. This is done so that we can compare with wireshark conversations.
-- The ordering of flows generated is by finish time, or if multiple flows have finished it is by start time
+- The ordering of flows generated is by its finishing time, or if multiple flows have finished it is by start time.
+- In order to speed up the process, only_summaries is set to True in FileCapture(), this significantly increases the packet generation time, however, the default fields for only_summaries does not include stream index and other fields, thus we have to do the following:
+  - the summaries are specified by psml file, which is linked to wireshark's gui column interface. Whatever attribute is displayed in wireshark's column interface is displayed by only_summaries.
+  - The easiest way is to open wireshark's gui interface and get all the important fields on the columns.
+  - Then go to help -> about wireshark -> folders -> preferences and search gui.column.format and copy the string.
+  - In FileCapture, specify custom_parameters to {'-o', 'gui.column.format:{string}'}
+  - Note that some fields common but have to be specified seperately for tcp and udp.
