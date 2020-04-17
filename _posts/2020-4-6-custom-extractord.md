@@ -91,4 +91,4 @@ Once a packet is read/received, the StreamingInterface notifies all observers. T
   - Then go to help -> about wireshark -> folders -> preferences and search gui.column.format and copy the string.
   - In FileCapture, specify custom_parameters to {'-o', 'gui.column.format:{string}'}
   - Note that some fields common but have to be specified seperately for tcp and udp.
-- When processing DoS datasets the timeout should set to a low number, otherwise the number of flows stored will be large and the speed of processing reduces significantly.
+- When processing DoS datasets the timeout should set to a low number, otherwise the number of flows stored will be large and the speed of processing reduces significantly. In real time interfaces it is unneccesary.
