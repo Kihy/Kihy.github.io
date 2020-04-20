@@ -16,8 +16,8 @@ Another detail to note is that parallel connections can mess up packet index. Th
 ## CIC IDS dataset
 
 As mentioned multiple times in the blog posts before, the flow features exhibits weird behavior that can be caused either by the flow feature extractor or the network traffic data. A closer look at the raw dataset pcap files shows the following:
-1. The flows provided with the dataset is wrong. It contains way too many single packet flows. This can be verified by using the CICFlowmeter on the raw pcap files.
-2. The extracted flow from the flow meter sometimes have 2 flows instead of 1 (maybe intended because of Bidirectional flows?). This can be verified by examining the conversations in wireshark(which is essentially a flow).
+1\. The flows provided with the dataset is wrong. It contains way too many single packet flows. This can be verified by using the CICFlowmeter on the raw pcap files.
+2\. The extracted flow from the flow meter sometimes have 2 flows instead of 1 (maybe intended because of Bidirectional flows?). This can be verified by examining the conversations in wireshark(which is essentially a flow).
 
 So our own flow extractor is probably needed.
 
@@ -62,33 +62,41 @@ When implementing tdigest, it was realised each flow does not have enough packet
 
 The upated features are:
 
-| feature name               | description                                       | number of features |
-| -------------------------- | ------------------------------------------------- | ------------------ |
-| duration                   | total duration of flow                            | 1                  |
-| protocol                   | protocol used for the flow                        | 1                  |
-| {dst,src}\_port            | destination and source port number                | 2                  |
-| {fwd,bwd}\_tot\_{pkt,byte} | total number of forward/backward packet and bytes | 2 \* 2             |
-| {fwd,bwd}_pkt_size_{stat}  | distribution of fwd/bwd packet size               | 2 \* 6             |
-| {fwd,bwd}_iat_{stat}       | distribution of fwd/bwd inter arrival time        | 2 \* 6             |
-| {fwd,bwd}\_{flags}\_cnt    | number of packets with various flags              | 2 \* 8             |
-| total                      | total number of features                          | 46                 |
+| feature name                | description                                       | number of features |
+| --------------------------- | ------------------------------------------------- | ------------------ |
+| duration                    | total duration of flow                            | 1                  |
+| protocol                    | protocol used for the flow                        | 1                  |
+| {dst,src}\_port             | destination and source port number                | 2                  |
+| {fwd,bwd}\_tot\_{pkt,byte}  | total number of forward/backward packet and bytes | 2 \* 2             |
+| {fwd,bwd}\_pkt_size\_{stat} | distribution of fwd/bwd packet size               | 2 \* 6             |
+| {fwd,bwd}\_iat\_{stat}      | distribution of fwd/bwd inter arrival time        | 2 \* 6             |
+| {fwd,bwd}\_{flags}\_cnt     | number of packets with various flags              | 2 \* 8             |
+| total                       | total number of features                          | 46                 |
 
 Where stat={mean,std,skew,kurtosis,min,max} and everything else is the same.
 
 ## Extractor logic
+
 The feature extractor uses observer pattern to be more robust. the observable is a StreamingInterface, where packet data is generated. Currently only offline interface that reads from a pcap file is developed. In the future it is possible to create a real-time interface reading directly from NIC.
 
 Once a packet is read/received, the StreamingInterface notifies all observers. The observers in this case is the flowmeter. Currently only TCP flowmeter is created, and it has a dictionary of flows that contain statistics of the flow. To reduce memory, if a flow did not have a packet 600 seconds since the last packet, it will be considered as finished, and thus saved to file and removed from our flow dictionary.
 
 ## implementation Details
-- The offline version of the flow meter relies on tshark's internal stream indexes to determine flows. For real time interface, probably need to create 5 tuples as index.
-- The flow meter currently only checks TCP and UDP packets.
-- The packet size attribute is the size of the entire packet, rather than size of tcp payload. This is done so that we can compare with wireshark conversations.
-- The ordering of flows generated is by its finishing time, or if multiple flows have finished it is by start time.
-- In order to speed up the process, only_summaries is set to True in FileCapture(), this significantly increases the packet generation time, however, the default fields for only_summaries does not include stream index and other fields, thus we have to do the following:
-  - the summaries are specified by psml file, which is linked to wireshark's gui column interface. Whatever attribute is displayed in wireshark's column interface is displayed by only_summaries.
-  - The easiest way is to open wireshark's gui interface and get all the important fields on the columns.
-  - Then go to help -> about wireshark -> folders -> preferences and search gui.column.format and copy the string.
-  - In FileCapture, specify custom_parameters to {'-o', 'gui.column.format:{string}'}
-  - Note that some fields common but have to be specified seperately for tcp and udp.
-- When processing DoS datasets the timeout should set to a low number, otherwise the number of flows stored will be large and the speed of processing reduces significantly. In real time interfaces it is unneccesary.
+
+-   The offline version of the flow meter relies on tshark's internal stream indexes to determine flows. For real time interface, probably need to create 5 tuples as index.
+-   The flow meter currently only checks TCP and UDP packets.
+-   The packet size attribute is the size of the entire packet, rather than size of tcp payload. This is done so that we can compare with wireshark conversations.
+-   The ordering of flows generated is by its finishing time, or if multiple flows have finished it is by start time.
+-   In order to speed up the process, only_summaries is set to True in FileCapture(), this significantly increases the packet generation time, however, the default fields for only_summaries does not include stream index and other fields, thus we have to do the following:
+    -   the summaries are specified by psml file, which is linked to wireshark's gui column interface. Whatever attribute is displayed in wireshark's column interface is displayed by only_summaries.
+    -   The easiest way is to open wireshark's gui interface and get all the important fields on the columns.
+    -   Then go to help -> about wireshark -> folders -> preferences and search gui.column.format and copy the string.
+    -   In FileCapture, specify custom_parameters to {'-o', 'gui.column.format:{string}'}
+    -   Note that some fields common but have to be specified seperately for tcp and udp.
+-   When processing DoS datasets the timeout should set to a low number, otherwise the number of flows stored will be large and the speed of processing reduces significantly. In real time interfaces it is unneccesary.
+-   For nmap scan the flags field may be reserved set to 100, in this case we ignore it.
+
+## Speed Boost
+When processing large files, the naive approach is extremely slow, since it has to process all flows for each packet arrival. To speed things up, there is a field that reduces the frequency of checking (-i).
+
+To further boost the speed, a Ordered dict is used instead of original dict. Once a new flow is generated, it is added at the end, once a flow is updated it is moved to the end (this operation is O(1), similar to linked list). This means we only have to check the first few flows at the head of the dictionary, as they will have not being updated in the longest time. The number of flows to check is specified with -l.  
