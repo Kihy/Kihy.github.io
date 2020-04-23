@@ -71,7 +71,7 @@ The upated features are:
 | {fwd,bwd}\_pkt_size\_{stat} | distribution of fwd/bwd packet size               | 2 \* 6             |
 | {fwd,bwd}\_iat\_{stat}      | distribution of fwd/bwd inter arrival time        | 2 \* 6             |
 | {fwd,bwd}\_{flags}\_cnt     | number of packets with various flags              | 2 \* 8             |
-| total                       | total number of features                          | 46                 |
+| total                       | total number of features                          | 48                 |
 
 Where stat={mean,std,skew,kurtosis,min,max} and everything else is the same.
 
